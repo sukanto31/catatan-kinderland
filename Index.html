@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#075985">
+    <title>Catatan Keuangan Kinderland</title>
+    <style>
+        :root {
+            --navy: #0f2740;
+            --blue: #087eb9;
+            --blue-dark: #075985;
+            --blue-soft: #e9f7fd;
+            --green: #168a52;
+            --green-soft: #eaf8f0;
+            --red: #dc4c4c;
+            --red-soft: #fff0f0;
+            --orange: #ee8f31;
+            --ink: #15263a;
+            --muted: #6c7a89;
+            --line: #e4ebf1;
+            --surface: #ffffff;
+            --canvas: #f4f8fb;
+            --shadow: 0 22px 60px rgba(15, 39, 64, .12);
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--canvas);
+            color: var(--ink);
+            font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button, input, select { font: inherit; }
+        button { cursor: pointer; }
+        .hidden { display: none !important; }
+
+        /* Login */
+        .login-page {
+            position: relative;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            padding: 28px 18px;
+            background:
+                radial-gradient(circle at 12% 12%, rgba(36, 182, 211, .28), transparent 28%),
+                radial-gradient(circle at 86% 84%, rgba(41, 155, 96, .20), transparent 30%),
+                linear-gradient(140deg, #eef9fd 0%, #f8fbfd 48%, #edf8f2 100%);
+        }
+
+        .login-page::before,
+        .login-page::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            border: 1px solid rgba(8, 126, 185, .15);
+            pointer-events: none;
+        }
+
+        .login-page::before { width: 520px; height: 520px; left: -270px; top: -245px; }
+        .login-page::after { width: 430px; height: 430px; right: -230px; bottom: -230px; }
+
+        .login-shell {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 420px;
+            width: min(100%, 980px);
+            min-height: 610px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, .9);
+            border-radius: 28px;
+            background: rgba(255, 255, 255, .76);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+        }
+
+        .login-visual {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            overflow: hidden;
+            padding: 52px;
+            color: #fff;
+            background:
+                linear-gradient(165deg, rgba(5, 74, 111, .80), rgba(9, 98, 91, .82)),
+                url("https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80") center/cover;
+        }
+
+        .login-visual::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(4, 34, 52, .42), transparent 62%);
+        }
+
+        .visual-content { position: relative; z-index: 1; max-width: 470px; }
+        .visual-kicker { margin: 0 0 12px; font-size: 13px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; opacity: .82; }
+        .visual-title { margin: 0; font-size: clamp(34px, 4vw, 50px); line-height: 1.08; letter-spacing: -.04em; }
+        .visual-copy { margin: 18px 0 0; max-width: 410px; color: rgba(255,255,255,.83); font-size: 16px; line-height: 1.75; }
+
+        .login-panel { display: flex; flex-direction: column; justify-content: center; padding: 48px 44px; background: rgba(255,255,255,.94); }
+        .brand-logo { display: block; width: min(230px, 78%); height: auto; margin: 0 auto 34px; }
+        .login-panel h1 { margin: 0; color: var(--navy); font-size: 29px; line-height: 1.2; letter-spacing: -.03em; }
+        .login-subtitle { margin: 10px 0 30px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+        .alert {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border: 1px solid #ffcaca;
+            border-radius: 12px;
+            background: var(--red-soft);
+            color: #b63232;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-label { display: block; margin: 0 0 8px; color: #34485d; font-size: 13px; font-weight: 750; }
+        .field-wrap { position: relative; }
+        .field-icon { position: absolute; left: 14px; top: 50%; width: 19px; height: 19px; transform: translateY(-50%); color: #8aa0b4; pointer-events: none; }
+        .form-control {
+            width: 100%;
+            height: 48px;
+            padding: 0 14px;
+            border: 1px solid #d8e2ea;
+            border-radius: 12px;
+            outline: none;
+            background: #fbfdfe;
+            color: var(--ink);
+            transition: .18s ease;
+        }
+        .form-control.with-icon { padding-left: 44px; }
+        .form-control:focus { border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px rgba(8, 126, 185, .12); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 12px;
+            font-weight: 800;
+            transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--blue), #0b6d9d); color: #fff; box-shadow: 0 12px 24px rgba(8, 126, 185, .22); }
+        .btn-primary:hover { box-shadow: 0 14px 28px rgba(8, 126, 185, .30); }
+        .login-note { margin: 18px 0 0; color: #92a1af; font-size: 11px; line-height: 1.55; text-align: center; }
+
+        /* Dashboard */
+        .app-page { min-height: 100vh; }
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            border-bottom: 1px solid rgba(228, 235, 241, .88);
+            background: rgba(255, 255, 255, .90);
+            backdrop-filter: blur(16px);
+        }
+        .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; width: min(100% - 32px, 1180px); min-height: 76px; margin: 0 auto; }
+        .app-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+        .app-brand img { width: 138px; height: auto; }
+        .brand-divider { width: 1px; height: 32px; background: var(--line); }
+        .app-brand-copy { min-width: 0; }
+        .app-brand-copy strong { display: block; overflow: hidden; color: var(--navy); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+        .app-brand-copy span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+        .topbar-actions { display: flex; align-items: center; gap: 10px; }
+        .role-badge { padding: 7px 11px; border-radius: 999px; background: var(--blue-soft); color: var(--blue-dark); font-size: 11px; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
+        .btn-ghost { min-height: 38px; padding: 8px 13px; border: 1px solid #dbe5ec; background: #fff; color: #536779; font-size: 12px; }
+        .btn-ghost:hover { border-color: #f3b4b4; background: #fff5f5; color: #c33f3f; }
+
+        .page-main { width: min(100% - 32px, 1180px); margin: 0 auto; padding: 38px 0 56px; }
+        .hero-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+        .eyebrow { margin: 0 0 8px; color: var(--blue); font-size: 12px; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+        .page-title { margin: 0; color: var(--navy); font-size: clamp(28px, 4vw, 40px); line-height: 1.13; letter-spacing: -.04em; }
+        .page-subtitle { margin: 10px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+        .live-status { display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--muted); font-size: 11px; font-weight: 700; white-space: nowrap; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #f0a43c; box-shadow: 0 0 0 4px rgba(240, 164, 60, .13); }
+        .status-dot.online { background: #28a665; box-shadow: 0 0 0 4px rgba(40, 166, 101, .13); }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 22px; }
+        .summary-card { position: relative; overflow: hidden; padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 10px 28px rgba(15, 39, 64, .06); }
+        .summary-card::after { content: ""; position: absolute; right: -20px; bottom: -40px; width: 120px; height: 120px; border-radius: 50%; opacity: .65; }
+        .summary-card.income::after { background: var(--green-soft); }
+        .summary-card.expense::after { background: var(--red-soft); }
+        .summary-card.balance::after { background: var(--blue-soft); }
+        .summary-head { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .summary-label { color: var(--muted); font-size: 12px; font-weight: 750; }
+        .summary-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 12px; font-size: 18px; font-weight: 900; }
+        .income .summary-icon { background: var(--green-soft); color: var(--green); }
+        .expense .summary-icon { background: var(--red-soft); color: var(--red); }
+        .balance .summary-icon { background: var(--blue-soft); color: var(--blue); }
+        .summary-value { position: relative; z-index: 1; margin: 18px 0 2px; color: var(--navy); font-size: clamp(22px, 3vw, 30px); font-weight: 850; letter-spacing: -.035em; }
+        .summary-meta { position: relative; z-index: 1; color: #91a0ae; font-size: 11px; }
+
+        .content-grid { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 20px; align-items: start; }
+        .panel { overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 10px 28px rgba(15, 39, 64, .055); }
+        .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+        .panel-title { margin: 0; color: var(--navy); font-size: 16px; letter-spacing: -.015em; }
+        .panel-caption { margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+        .panel-body { padding: 22px; }
+        .entry-panel { position: sticky; top: 98px; }
+        .entry-panel .form-control { height: 46px; }
+        .entry-panel textarea { min-height: 94px; padding-top: 12px; resize: vertical; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .amount-wrap { position: relative; }
+        .currency-prefix { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; font-weight: 750; }
+        .amount-wrap input { padding-left: 42px; }
+        .btn-save { width: 100%; margin-top: 4px; color: #fff; background: linear-gradient(135deg, var(--blue), #086899); box-shadow: 0 10px 20px rgba(8, 126, 185, .18); }
+
+        .table-toolbar { display: flex; align-items: center; gap: 10px; }
+        .search-box { position: relative; width: min(240px, 44vw); }
+        .search-box input { width: 100%; height: 38px; padding: 0 12px 0 36px; border: 1px solid #dce5ec; border-radius: 10px; outline: 0; background: #f9fbfc; color: var(--ink); font-size: 12px; }
+        .search-box input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(8,126,185,.10); }
+        .search-box svg { position: absolute; left: 11px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); color: #8da0b0; }
+        .filter-select { height: 38px; padding: 0 30px 0 11px; border: 1px solid #dce5ec; border-radius: 10px; outline: none; background: #f9fbfc; color: #536779; font-size: 12px; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; min-width: 680px; border-collapse: collapse; }
+        th { padding: 13px 16px; border-bottom: 1px solid var(--line); background: #f8fafc; color: #7b8c9c; font-size: 10px; font-weight: 850; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
+        td { padding: 15px 16px; border-bottom: 1px solid #edf1f4; color: #425466; font-size: 13px; }
+        tbody tr { transition: background .15s ease; }
+        tbody tr:hover { background: #fbfdfe; }
+        tbody tr:last-child td { border-bottom: 0; }
+        .row-number { color: #98a6b3; font-size: 11px; font-weight: 750; }
+        .date-cell { white-space: nowrap; }
+        .description-cell { max-width: 260px; color: var(--navy); font-weight: 700; }
+        .type-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border-radius: 999px; font-size: 10px; font-weight: 850; text-transform: uppercase; }
+        .type-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+        .type-pill.income { background: var(--green-soft); color: var(--green); }
+        .type-pill.income::before { background: var(--green); }
+        .type-pill.expense { background: var(--red-soft); color: var(--red); }
+        .type-pill.expense::before { background: var(--red); }
+        .amount-cell { font-weight: 850; text-align: right; white-space: nowrap; }
+        .amount-cell.income { color: var(--green); }
+        .amount-cell.expense { color: var(--red); }
+        .action-cell { width: 56px; text-align: center; }
+        .delete-btn { display: inline-grid; width: 32px; height: 32px; place-items: center; border: 1px solid #f3d2d2; border-radius: 9px; background: #fff7f7; color: var(--red); }
+        .delete-btn:hover { background: #ffe9e9; }
+        .delete-btn svg { width: 15px; height: 15px; }
+
+        .state-box { padding: 58px 24px; color: var(--muted); text-align: center; }
+        .state-icon { display: grid; width: 52px; height: 52px; margin: 0 auto 14px; place-items: center; border-radius: 16px; background: var(--blue-soft); color: var(--blue); font-size: 22px; }
+        .state-box strong { display: block; margin-bottom: 5px; color: var(--navy); font-size: 14px; }
+        .state-box span { font-size: 12px; }
+
+        .toast {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: min(360px, calc(100vw - 36px));
+            padding: 13px 16px;
+            border-radius: 13px;
+            background: var(--navy);
+            color: #fff;
+            box-shadow: 0 16px 35px rgba(15,39,64,.25);
+            font-size: 12px;
+            font-weight: 700;
+            animation: toast-in .22s ease both;
+        }
+        .toast.error { background: #a93636; }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
+
+        @media (max-width: 900px) {
+            .login-shell { grid-template-columns: 1fr; width: min(100%, 480px); min-height: auto; }
+            .login-visual { display: none; }
+            .login-panel { padding: 42px 36px; }
+            .content-grid { grid-template-columns: 1fr; }
+            .entry-panel { position: static; }
+        }
+
+        @media (max-width: 680px) {
+            .topbar-inner, .page-main { width: min(100% - 24px, 1180px); }
+            .topbar-inner { min-height: 68px; }
+            .app-brand img { width: 116px; }
+            .brand-divider, .app-brand-copy { display: none; }
+            .role-badge { display: none; }
+            .page-main { padding-top: 26px; }
+            .hero-row { align-items: flex-start; flex-direction: column; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .summary-card { padding: 18px; }
+            .panel-head { align-items: flex-start; flex-direction: column; }
+            .table-toolbar { width: 100%; }
+            .search-box { width: 100%; flex: 1; }
+            .login-panel { padding: 36px 24px; }
+            .brand-logo { margin-bottom: 28px; }
+        }
+
+        @media (max-width: 430px) {
+            .field-row { grid-template-columns: 1fr; gap: 0; }
+            .filter-select { max-width: 116px; }
+        }
+    </style>
+</head>
+<body>
+    <section id="loginScreen" class="login-page">
+        <div class="login-shell">
+            <div class="login-visual" aria-hidden="true">
+                <div class="visual-content">
+                    <p class="visual-kicker">Kinderland Bandung</p>
+                    <h2 class="visual-title">Catatan rapi,<br>kegiatan lebih berarti.</h2>
+                    <p class="visual-copy">Kelola pemasukan dan pengeluaran kegiatan Field Trip dalam satu ruang kerja yang sederhana, aman, dan mudah dipahami.</p>
+                </div>
+            </div>
+
+            <div class="login-panel">
+                <img class="brand-logo" src="https://kinderlandindonesia.com/wp-content/uploads/2023/01/kinderland-preschool-logo.svg" alt="Kinderland Preschool">
+                <h1>Selamat datang</h1>
+                <p class="login-subtitle">Masuk untuk membuka catatan keuangan Field Trip Bandung.</p>
+
+                <div id="loginError" class="alert hidden" role="alert">Username atau password belum sesuai. Silakan periksa kembali.</div>
+
+                <form id="loginForm" autocomplete="on">
+                    <div class="form-group">
+                        <label class="form-label" for="loginUsername">Username</label>
+                        <div class="field-wrap">
+                            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input class="form-control with-icon" id="loginUsername" type="text" autocomplete="username" placeholder="Masukkan username" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">Password</label>
+                        <div class="field-wrap">
+                            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                            <input class="form-control with-icon" id="loginPassword" type="password" autocomplete="current-password" placeholder="Masukkan password" required>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">Masuk ke dashboard <span aria-hidden="true">→</span></button>
+                </form>
+                <p class="login-note">Akses hanya untuk pengguna yang berwenang.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="mainApp" class="app-page hidden">
+        <header class="topbar">
+            <div class="topbar-inner">
+                <div class="app-brand">
+                    <img src="https://kinderlandindonesia.com/wp-content/uploads/2023/01/kinderland-preschool-logo.svg" alt="Kinderland Preschool">
+                    <span class="brand-divider"></span>
+                    <div class="app-brand-copy">
+                        <strong>Field Trip Bandung</strong>
+                        <span>Financial workspace</span>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <span id="roleBadge" class="role-badge">Admin</span>
+                    <button id="logoutButton" class="btn btn-ghost" type="button">Keluar</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-main">
+            <div class="hero-row">
+                <div>
+                    <p class="eyebrow">Ringkasan Keuangan</p>
+                    <h1 class="page-title">Catatan Field Trip</h1>
+                    <p id="welcomeText" class="page-subtitle">Selamat datang. Berikut kondisi keuangan terbaru.</p>
+                </div>
+                <div class="live-status"><span id="statusDot" class="status-dot"></span><span id="connectionText">Menghubungkan data...</span></div>
+            </div>
+
+            <section class="summary-grid" aria-label="Ringkasan saldo">
+                <article class="summary-card income">
+                    <div class="summary-head"><span class="summary-label">Total pemasukan</span><span class="summary-icon">↗</span></div>
+                    <div id="totalIncomeDisplay" class="summary-value">Rp 0</div>
+                    <div class="summary-meta">Akumulasi dana masuk</div>
+                </article>
+                <article class="summary-card expense">
+                    <div class="summary-head"><span class="summary-label">Total pengeluaran</span><span class="summary-icon">↘</span></div>
+                    <div id="totalExpenseDisplay" class="summary-value">Rp 0</div>
+                    <div class="summary-meta">Akumulasi dana keluar</div>
+                </article>
+                <article class="summary-card balance">
+                    <div class="summary-head"><span class="summary-label">Sisa dana</span><span class="summary-icon">=</span></div>
+                    <div id="balanceDisplay" class="summary-value">Rp 0</div>
+                    <div class="summary-meta">Saldo terkini</div>
+                </article>
+            </section>
+
+            <div class="content-grid">
+                <aside id="entryPanel" class="panel entry-panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Tambah catatan</h2>
+                            <p class="panel-caption">Masukkan transaksi baru dengan lengkap.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form id="transactionForm">
+                            <div class="form-group">
+                                <label class="form-label" for="date">Tanggal transaksi</label>
+                                <input class="form-control" id="date" type="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="description">Keterangan</label>
+                                <textarea class="form-control" id="description" placeholder="Contoh: Biaya transportasi" maxlength="120" required></textarea>
+                            </div>
+                            <div class="field-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="type">Jenis</label>
+                                    <select class="form-control" id="type" required>
+                                        <option value="income">Pemasukan</option>
+                                        <option value="expense">Pengeluaran</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="amount">Jumlah</label>
+                                    <div class="amount-wrap">
+                                        <span class="currency-prefix">Rp</span>
+                                        <input class="form-control" id="amount" type="number" min="1" step="1" placeholder="0" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-save" type="submit">Simpan catatan <span aria-hidden="true">＋</span></button>
+                        </form>
+                    </div>
+                </aside>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Riwayat transaksi</h2>
+                            <p id="recordCount" class="panel-caption">Memuat catatan...</p>
+                        </div>
+                        <div class="table-toolbar">
+                            <div class="search-box">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                                <input id="searchInput" type="search" placeholder="Cari keterangan..." aria-label="Cari transaksi">
+                            </div>
+                            <select id="filterType" class="filter-select" aria-label="Filter jenis transaksi">
+                                <option value="all">Semua</option>
+                                <option value="income">Pemasukan</option>
+                                <option value="expense">Pengeluaran</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="tableContainer" class="table-wrap hidden">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:54px">No.</th>
+                                    <th>Tanggal</th>
+                                    <th>Keterangan</th>
+                                    <th>Jenis</th>
+                                    <th style="text-align:right">Jumlah</th>
+                                    <th id="actionHeader" style="text-align:center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="loadingState" class="state-box">
+                        <div class="state-icon">⋯</div>
+                        <strong>Membuka data</strong>
+                        <span>Mohon tunggu sebentar.</span>
+                    </div>
+
+                    <div id="emptyState" class="state-box hidden">
+                        <div class="state-icon">⌁</div>
+                        <strong>Belum ada transaksi</strong>
+                        <span>Catatan baru akan tampil di bagian ini.</span>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </section>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, deleteDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVVa_kCGxCoOfgoik8OzDPiDL_fwoXbkw",
+            authDomain: "kinderlandk2.firebaseapp.com",
+            projectId: "kinderlandk2",
+            storageBucket: "kinderlandk2.firebasestorage.app",
+            messagingSenderId: "476859024534",
+            appId: "1:476859024534:web:e13e8988fe4b612aa16eb7",
+            measurementId: "G-9FF3374MPK"
+        };
+
+        const els = {
+            loginScreen: document.getElementById('loginScreen'),
+            mainApp: document.getElementById('mainApp'),
+            loginForm: document.getElementById('loginForm'),
+            loginError: document.getElementById('loginError'),
+            username: document.getElementById('loginUsername'),
+            password: document.getElementById('loginPassword'),
+            logout: document.getElementById('logoutButton'),
+            roleBadge: document.getElementById('roleBadge'),
+            welcome: document.getElementById('welcomeText'),
+            statusDot: document.getElementById('statusDot'),
+            connectionText: document.getElementById('connectionText'),
+            entryPanel: document.getElementById('entryPanel'),
+            transactionForm: document.getElementById('transactionForm'),
+            date: document.getElementById('date'),
+            description: document.getElementById('description'),
+            type: document.getElementById('type'),
+            amount: document.getElementById('amount'),
+            tableContainer: document.getElementById('tableContainer'),
+            tableBody: document.getElementById('transactionTableBody'),
+            actionHeader: document.getElementById('actionHeader'),
+            loading: document.getElementById('loadingState'),
+            empty: document.getElementById('emptyState'),
+            recordCount: document.getElementById('recordCount'),
+            search: document.getElementById('searchInput'),
+            filter: document.getElementById('filterType'),
+            income: document.getElementById('totalIncomeDisplay'),
+            expense: document.getElementById('totalExpenseDisplay'),
+            balance: document.getElementById('balanceDisplay'),
+            toast: document.getElementById('toast')
+        };
+
+        let transactions = [];
+        let currentRole = '';
+        let db = null;
+        let toastTimer = null;
+
+        els.date.value = new Date().toISOString().slice(0, 10);
+
+        const rupiah = value => new Intl.NumberFormat('id-ID', {
+            style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0
+        }).format(Number(value) || 0);
+
+        const dateLabel = value => {
+            const date = new Date(`${value}T00:00:00`);
+            return Number.isNaN(date.getTime()) ? '-' : new Intl.DateTimeFormat('id-ID', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            }).format(date);
+        };
+
+        function showToast(message, kind = 'success') {
+            window.clearTimeout(toastTimer);
+            els.toast.textContent = message;
+            els.toast.className = `toast${kind === 'error' ? ' error' : ''}`;
+            toastTimer = window.setTimeout(() => els.toast.classList.add('hidden'), 2800);
+        }
+
+        function setConnection(message, online = false) {
+            els.connectionText.textContent = message;
+            els.statusDot.classList.toggle('online', online);
+        }
+
+        function openDashboard() {
+            const isAdmin = currentRole === 'admin';
+            els.loginScreen.classList.add('hidden');
+            els.mainApp.classList.remove('hidden');
+            els.roleBadge.textContent = isAdmin ? 'Admin' : 'Viewer';
+            els.welcome.textContent = isAdmin
+                ? 'Login sebagai Admin · Anda dapat menambah dan menghapus transaksi.'
+                : 'Login sebagai Viewer · Mode hanya lihat.';
+            els.entryPanel.classList.toggle('hidden', !isAdmin);
+            els.actionHeader.classList.toggle('hidden', !isAdmin);
+            render();
+        }
+
+        function logout() {
+            currentRole = '';
+            els.username.value = '';
+            els.password.value = '';
+            els.loginError.classList.add('hidden');
+            els.mainApp.classList.add('hidden');
+            els.loginScreen.classList.remove('hidden');
+            els.username.focus();
+        }
+
+        els.loginForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const username = els.username.value.trim();
+            const password = els.password.value;
+
+            if (username === 'sanya' && password === 'sanya') {
+                currentRole = 'admin';
+            } else if (username === 'user' && password === 'user') {
+                currentRole = 'viewer';
+            } else {
+                els.loginError.classList.remove('hidden');
+                return;
+            }
+
+            els.loginError.classList.add('hidden');
+            openDashboard();
+        });
+
+        els.username.addEventListener('input', () => els.loginError.classList.add('hidden'));
+        els.password.addEventListener('input', () => els.loginError.classList.add('hidden'));
+        els.logout.addEventListener('click', logout);
+        els.search.addEventListener('input', render);
+        els.filter.addEventListener('change', render);
+
+        function createCell(className, value) {
+            const cell = document.createElement('td');
+            if (className) cell.className = className;
+            cell.textContent = value;
+            return cell;
+        }
+
+        function render() {
+            const totalIncome = transactions.filter(item => item.type === 'income').reduce((sum, item) => sum + Number(item.amount || 0), 0);
+            const totalExpense = transactions.filter(item => item.type === 'expense').reduce((sum, item) => sum + Number(item.amount || 0), 0);
+            els.income.textContent = rupiah(totalIncome);
+            els.expense.textContent = rupiah(totalExpense);
+            els.balance.textContent = rupiah(totalIncome - totalExpense);
+
+            const keyword = els.search.value.trim().toLocaleLowerCase('id');
+            const type = els.filter.value;
+            const visible = transactions.filter(item => {
+                const matchesText = String(item.description || '').toLocaleLowerCase('id').includes(keyword);
+                const matchesType = type === 'all' || item.type === type;
+                return matchesText && matchesType;
+            });
+
+            els.tableBody.replaceChildren();
+            els.recordCount.textContent = `${visible.length} dari ${transactions.length} transaksi ditampilkan`;
+
+            visible.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.appendChild(createCell('row-number', String(index + 1).padStart(2, '0')));
+                row.appendChild(createCell('date-cell', dateLabel(item.date)));
+                row.appendChild(createCell('description-cell', item.description || '-'));
+
+                const typeCell = document.createElement('td');
+                const pill = document.createElement('span');
+                pill.className = `type-pill ${item.type === 'income' ? 'income' : 'expense'}`;
+                pill.textContent = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
+                typeCell.appendChild(pill);
+                row.appendChild(typeCell);
+
+                const sign = item.type === 'income' ? '+' : '−';
+                row.appendChild(createCell(`amount-cell ${item.type}`, `${sign} ${rupiah(item.amount)}`));
+
+                if (currentRole === 'admin') {
+                    const actionCell = document.createElement('td');
+                    actionCell.className = 'action-cell';
+                    const button = document.createElement('button');
+                    button.className = 'delete-btn';
+                    button.type = 'button';
+                    button.title = 'Hapus transaksi';
+                    button.setAttribute('aria-label', `Hapus ${item.description || 'transaksi'}`);
+                    button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3m-9 0 1 14h10l1-14M10 11v6m4-6v6"/></svg>';
+                    button.addEventListener('click', () => deleteTransaction(item));
+                    actionCell.appendChild(button);
+                    row.appendChild(actionCell);
+                }
+
+                els.tableBody.appendChild(row);
+            });
+
+            const ready = els.loading.classList.contains('hidden');
+            const noResults = visible.length === 0;
+            els.tableContainer.classList.toggle('hidden', !ready || noResults);
+            els.empty.classList.toggle('hidden', !ready || !noResults);
+
+            if (ready && noResults && transactions.length > 0) {
+                els.empty.querySelector('strong').textContent = 'Transaksi tidak ditemukan';
+                els.empty.querySelector('span').textContent = 'Coba ubah pencarian atau filter Anda.';
+            } else {
+                els.empty.querySelector('strong').textContent = 'Belum ada transaksi';
+                els.empty.querySelector('span').textContent = 'Catatan baru akan tampil di bagian ini.';
+            }
+        }
+
+        els.transactionForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            if (currentRole !== 'admin') return;
+
+            const transaction = {
+                id: Date.now(),
+                date: els.date.value,
+                description: els.description.value.trim(),
+                type: els.type.value,
+                amount: Number(els.amount.value),
+                createdAt: Date.now()
+            };
+
+            if (!transaction.description || !transaction.amount || transaction.amount < 1) {
+                showToast('Lengkapi keterangan dan jumlah transaksi.', 'error');
+                return;
+            }
+
+            try {
+                if (db) {
+                    await addDoc(collection(db, 'keuanganku'), transaction);
+                } else {
+                    transactions.push(transaction);
+                    saveLocal();
+                    sortTransactions();
+                    render();
+                }
+                els.description.value = '';
+                els.amount.value = '';
+                els.description.focus();
+                showToast('Catatan berhasil disimpan.');
+            } catch (error) {
+                console.error(error);
+                showToast('Catatan belum dapat disimpan.', 'error');
+            }
+        });
+
+        async function deleteTransaction(item) {
+            if (currentRole !== 'admin') return;
+            if (!window.confirm(`Hapus catatan “${item.description || 'Tanpa keterangan'}”?`)) return;
+
+            try {
+                if (db && item.firebaseId) {
+                    await deleteDoc(doc(db, 'keuanganku', item.firebaseId));
+                } else {
+                    transactions = transactions.filter(entry => entry.id !== item.id);
+                    saveLocal();
+                    render();
+                }
+                showToast('Catatan berhasil dihapus.');
+            } catch (error) {
+                console.error(error);
+                showToast('Catatan belum dapat dihapus.', 'error');
+            }
+        }
+
+        function sortTransactions() {
+            transactions.sort((a, b) => {
+                const byDate = new Date(b.date).getTime() - new Date(a.date).getTime();
+                return byDate || Number(b.createdAt || 0) - Number(a.createdAt || 0);
+            });
+        }
+
+        function saveLocal() {
+            localStorage.setItem('keuangan_app_data', JSON.stringify(transactions));
+        }
+
+        function useLocalStorage(message = 'Mode penyimpanan lokal') {
+            try {
+                transactions = JSON.parse(localStorage.getItem('keuangan_app_data') || '[]');
+            } catch {
+                transactions = [];
+            }
+            sortTransactions();
+            els.loading.classList.add('hidden');
+            setConnection(message, false);
+            render();
+        }
+
+        function initData() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                onSnapshot(collection(db, 'keuanganku'), snapshot => {
+                    transactions = snapshot.docs.map(entry => ({ firebaseId: entry.id, ...entry.data() }));
+                    sortTransactions();
+                    els.loading.classList.add('hidden');
+                    setConnection('Data tersinkron', true);
+                    render();
+                }, error => {
+                    console.error(error);
+                    db = null;
+                    useLocalStorage('Database tidak tersedia · mode lokal');
+                });
+            } catch (error) {
+                console.error(error);
+                db = null;
+                useLocalStorage();
+            }
+        }
+
+        initData();
+    </script>
+</body>
+</html>
