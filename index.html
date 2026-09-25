@@ -206,6 +206,7 @@
         .summary-meta { position: relative; z-index: 1; color: #91a0ae; font-size: 11px; }
 
         .content-grid { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 20px; align-items: start; }
+        .app-page.viewer-mode .content-grid { grid-template-columns: minmax(0, 1fr); }
         .panel { overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 10px 28px rgba(15, 39, 64, .055); }
         .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
         .panel-title { margin: 0; color: var(--navy); font-size: 16px; letter-spacing: -.015em; }
@@ -571,6 +572,7 @@
             els.welcome.textContent = isAdmin
                 ? 'Login sebagai Admin · Anda dapat menambah dan menghapus transaksi.'
                 : 'Login sebagai Viewer · Mode hanya lihat.';
+            els.mainApp.classList.toggle('viewer-mode', !isAdmin);
             els.entryPanel.classList.toggle('hidden', !isAdmin);
             els.actionHeader.classList.toggle('hidden', !isAdmin);
             render();
